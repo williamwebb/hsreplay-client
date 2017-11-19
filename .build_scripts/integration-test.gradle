@@ -1,0 +1,25 @@
+// Assumes 'java', 'groovy' or 'scala' plugins have been applied before
+
+// Add integration test source sets
+sourceSets {
+    integrationTest { sourceSet ->
+        ["java", "groovy", "scala", "kotlin", "resources"].each {
+            if (!sourceSet.hasProperty(it)) return
+            sourceSet."$it".srcDir file("src/integrationTest/${it}")
+        }
+    }
+}
+
+// Setup dependencies for integration testing
+dependencies {
+    integrationTestImplementation sourceSets.main.output
+    integrationTestImplementation configurations.testImplementation
+    integrationTestImplementation sourceSets.test.output
+    integrationTestRuntime configurations.testRuntime
+}
+
+// Define integration test task
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
